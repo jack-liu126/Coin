@@ -1,100 +1,142 @@
 import React, { useState, useEffect } from 'react';
+import { GetCoins } from '../utils/fetch';
 import Layout from '../layout';
 
 const AddCoin = () => {
-    const [coinPairs, setCoinPairs] = useState([]);
-    const [filteredCoinPairs, setFilteredCoinPairs] = useState([]);
-    const [perPage, setPerPage] = useState(10);
-    const [filterText, setFilterText] = useState('');
+    const [coins, setCoins] = useState([]);
+    const [filteredCoins, setFilteredCoins] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [filter, setFilter] = useState('');
 
     useEffect(() => {
-        // Fetch data from the "GetCoinPair" API
-        fetch('API_URL')
-            .then(response => response.json())
-            .then(data => {
-                setCoinPairs(data);
-                setFilteredCoinPairs(data);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
+        GetCoins([setCoins, setFilteredCoins]);
     }, []);
 
-    const handleAddCoinPair = () => {
-        // Logic to add a new coin pair
-    };
-
-    const handleEditCoinPair = (index) => {
-        // Logic to edit a coin pair at the specified index
-    };
-
-    const handleDeleteCoinPair = (index) => {
-        // Logic to delete a coin pair at the specified index
-    };
-
-    const handlePerPageChange = (event) => {
-        setPerPage(parseInt(event.target.value));
-    };
-
-    const handleFilterTextChange = (event) => {
-        setFilterText(event.target.value);
-        filterCoinPairs(event.target.value);
-    };
-
-    const filterCoinPairs = (text) => {
-        const filtered = coinPairs.filter(pair =>
-            pair.switchCoin1.includes(text) || pair.switchCoin2.includes(text)
+    // Handle filter change
+    const handleFilterChange = e => {
+        const value = e.target.value;
+        setFilter(value);
+        const filteredData = coins.filter(coin =>
+            coin.Name.toLowerCase().includes(value.toLowerCase())
         );
-        setFilteredCoinPairs(filtered);
+        setFilteredCoins(filteredData);
+    };
+
+    // Handle items per page change
+    const handleItemsPerPageChange = e => {
+        const value = parseInt(e.target.value);
+        setItemsPerPage(value);
+    };
+
+    // Calculate pagination
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredCoins.slice(indexOfFirstItem, indexOfLastItem);
+
+    // Render table rows
+    const renderTableRows = () => {
+        return currentItems.map(coin => (
+            <tr key={coin.Id}>
+                <td className='text-center'>{coin.Id}</td>
+                <td>{coin.Name}</td>
+                <td className='text-center'>
+                    <input type='button' value='edit' className='btn btn-primary me-2' />
+                    <input type='button' value='delete' className='btn btn-danger' />
+                </td>
+            </tr>
+        ));
+    };
+
+    // Render pagination
+    const renderPagination = () => {
+        const pageNumbers = Math.ceil(filteredCoins.length / itemsPerPage);
+        return (
+            <ul className="pagination">
+                {currentPage > 1 && (
+                    <li className="page-item" onClick={() => setCurrentPage(currentPage - 1)}>
+                        <a href="#" className="page-link">&laquo;</a>
+                    </li>
+                )}
+                {currentPage === 1 && (
+                    <li className="page-item disabled">
+                        <a href="#" className="page-link">&laquo;</a>
+                    </li>
+                )}
+                {Array.from({ length: pageNumbers }, (_, index) => (
+                    <li
+                        key={index}
+                        className={currentPage === index + 1 ? 'page-item active' : 'page-item'}
+                        onClick={() => setCurrentPage(index + 1)}
+                    >
+                        <a href="#" className="page-link">{index + 1}</a>
+                    </li>
+                ))}
+                {currentPage < pageNumbers && (
+                    <li className="page-item" onClick={() => setCurrentPage(currentPage + 1)}>
+                        <a href="#" className="page-link">&raquo;</a>
+                    </li>
+                )}
+                {currentPage === pageNumbers && (
+                    <li className="page-item disabled">
+                        <a href="#" className="page-link">&raquo;</a>
+                    </li>
+                )}
+            </ul>
+        );
     };
 
     return (
-        <>
+        <div>
             <Layout />
-            <div>
-                <h1>Add Coin</h1>
-
+            <h1>Coin List</h1>
+            <div className='d-flex justify-content-between'>
                 <div>
-                    <label>Rows per page:</label>
-                    <select value={perPage} onChange={handlePerPageChange}>
-                        <option value={10}>10</option>
-                        <option value={20}>20</option>
-                        <option value={50}>50</option>
-                        <option value={100}>100</option>
-                    </select>
+                    <input type='button' value='Add Coin' className='btn btn-success' />
                 </div>
-
-                <div>
-                    <label>Filter:</label>
-                    <input type="text" value={filterText} onChange={handleFilterTextChange} />
+                <div className='mb-3 row'>
+                    <label className='col-form-label col'>Filter:</label>
+                    <div className='col'>
+                        <input
+                            className='form-control'
+                            style={{ width: '200px' }}
+                            type="text"
+                            value={filter}
+                            onChange={handleFilterChange}
+                            placeholder="Filter by Name"
+                        />
+                    </div>
                 </div>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Switch Coin 1</th>
-                            <th>Switch Coin 2</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredCoinPairs.slice(0, perPage).map((pair, index) => (
-                            <tr key={index}>
-                                <td>{pair.switchCoin1}</td>
-                                <td>{pair.switchCoin2}</td>
-                                <td>
-                                    <button onClick={() => handleEditCoinPair(index)}>Edit</button>
-                                    <button onClick={() => handleDeleteCoinPair(index)}>Delete</button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-
-                {/* Add coin pair form */}
-                {/* Edit coin pair form */}
             </div>
-        </>
+            <table className='table'>
+                <thead className='text-center'>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th style={{ width: '200px' }}>Action</th>
+                    </tr>
+                </thead>
+                <tbody>{renderTableRows()}</tbody>
+            </table>
+            <div className="row">
+                <div className='col-4'></div>
+                <div className='col-4 d-flex justify-content-center'>
+                    <div>
+                        {renderPagination()}
+                    </div>
+                </div>
+                <div className='col-4 d-flex justify-content-end'>
+                    <label className='col-form-label me-2'>Items per page:</label>
+                    <div>
+                        <select className="form-control" value={itemsPerPage} onChange={handleItemsPerPageChange}>
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={50}>50</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 };
 

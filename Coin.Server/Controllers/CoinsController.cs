@@ -1,4 +1,5 @@
 ﻿using Coin.Server.Models;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -6,6 +7,7 @@ namespace Coin.Server.Controllers;
 
 [Route("[controller]")]
 [ApiController]
+[EnableCors("AllowSpecificOrigin")]
 public class CoinsController : ControllerBase
 {
     private readonly ILogger<CoinsController> _logger;
@@ -26,8 +28,17 @@ public class CoinsController : ControllerBase
 
             List<CoinData> Coins = new List<CoinData>
             {
-                new CoinData { Id = 1, Name = "Bitcoin", Symbol = "BTC" },
-                new CoinData { Id = 2, Name = "Ethereum", Symbol = "ETH" }
+                new CoinData { Id = 1, Name = "BTC"},
+                new CoinData { Id = 2, Name = "ETH" },
+                new CoinData { Id = 3, Name = "FTM" },
+                new CoinData { Id = 4, Name = "SOL" },
+                new CoinData { Id = 5, Name = "LUNA" },
+                new CoinData { Id = 6, Name = "ORDI" },
+                new CoinData { Id = 7, Name = "AI" },
+                new CoinData { Id = 8, Name = "MATIC" },
+                new CoinData { Id = 9, Name = "PROTAL" },
+                new CoinData { Id = 10, Name = "WLD" },
+                new CoinData { Id = 11, Name = "API3" },
             };
 
             cr.Content = JsonSerializer.Serialize(Coins);
