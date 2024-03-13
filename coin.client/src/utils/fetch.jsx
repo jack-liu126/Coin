@@ -29,3 +29,15 @@ const fetchData = async (url, setState, method = 'GET', body = null) => {
 export const GetCoins = (setCoins) => {
     fetchData(baseUrl + '/Coins/GetCoins', setCoins);
 }
+
+export const AddCoin = (coin, setMsg) => {
+    fetchData(baseUrl + '/Coins/AddCoin', setMsg, 'POST', coin);
+}
+
+export const EditCoin = (coin, setMsg) => {
+    fetchData(baseUrl + '/Coins/EditCoin', setMsg, 'POST', coin);
+}
+
+export const DeleteCoin = (coinId, setMsg) => {
+    fetchData(baseUrl + '/Coins/DeleteCoin', setMsg, 'POST', { id: coinId });
+}

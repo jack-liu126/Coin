@@ -1,3 +1,5 @@
+using Coin.Server.Appcode;
+using Microsoft.Data.SqlClient;
 using NLog;
 using NLog.Extensions.Logging;
 using NLog.Web;
@@ -35,6 +37,12 @@ try
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
     builder.Host.UseNLog();
+
+    builder.Services.AddScoped<DBHelper>(o =>
+    {
+        ILogger<DBHelper> logger = o.GetRequiredService<ILogger<DBHelper>>();
+        return new DBHelper(logger, new SqlConnection(config.GetConnectionString("coin")));
+    });
 
     var app = builder.Build();
 

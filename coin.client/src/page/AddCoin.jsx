@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { GetCoins } from '../utils/fetch';
+import { DeleteCoin, GetCoins } from '../utils/fetch';
 import Layout from '../layout';
+import CoinModal from '../components/CoinModal';
+import Swal from 'sweetalert2';
 
 const AddCoin = () => {
     const [coins, setCoins] = useState([]);
@@ -8,6 +10,10 @@ const AddCoin = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [filter, setFilter] = useState('');
+    const [msg, setMsg] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [coinId, setCoinId] = useState(0);
+    const [coinName, setCoinName] = useState('');
 
     useEffect(() => {
         GetCoins([setCoins, setFilteredCoins]);
@@ -41,8 +47,8 @@ const AddCoin = () => {
                 <td className='text-center'>{coin.Id}</td>
                 <td>{coin.Name}</td>
                 <td className='text-center'>
-                    <input type='button' value='edit' className='btn btn-primary me-2' />
-                    <input type='button' value='delete' className='btn btn-danger' />
+                    <input type='button' value='Edit' className='btn btn-primary me-2' onClick={() => handleEditCoin(coin.Id, coin.Name)} />
+                    <input type='button' value='Delete' className='btn btn-danger' onClick={() => handleDeleteCoin(coin.Id)} />
                 </td>
             </tr>
         ));
@@ -86,13 +92,45 @@ const AddCoin = () => {
         );
     };
 
+    const handleAddCoin = () => {
+        setShowModal(true);
+        setCoinId(0);
+        setCoinName('');
+    }
+
+    const handleEditCoin = (id, name) => {
+        setShowModal(true);
+        setCoinId(id);
+        setCoinName(name);
+    }
+
+    const handleDeleteCoin = (id) => {
+        Swal.fire({
+            title: "Are you sure?",
+            showDenyButton: true,
+            confirmButtonText: "Yes, delete it!",
+            denyButtonText: "No, don't delete!",
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                DeleteCoin(id, setMsg);
+                GetCoins([setCoins, setFilteredCoins]);
+                Swal.fire({
+                    icon: "info",
+                    title: "Deleted",
+                    text: "Coin deleted successfully!",
+                });
+            }
+        });
+    }
+
     return (
         <div>
             <Layout />
             <h1>Coin List</h1>
             <div className='d-flex justify-content-between'>
                 <div>
-                    <input type='button' value='Add Coin' className='btn btn-success' />
+                    <input type='button' value='Add Coin' className='btn btn-success' onClick={() => handleAddCoin()} />
                 </div>
                 <div className='mb-3 row'>
                     <label className='col-form-label col'>Filter:</label>
@@ -136,6 +174,15 @@ const AddCoin = () => {
                     </div>
                 </div>
             </div>
+            <CoinModal
+                id={coinId}
+                name={coinName}
+                setMsg={setMsg}
+                show={showModal}
+                setShow={setShowModal}
+                setCoins={setCoins}
+                setFilteredCoins={setFilteredCoins}
+            />
         </div>
     );
 };
