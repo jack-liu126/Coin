@@ -3,29 +3,55 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import { AddCoin, EditCoin, GetCoins } from '../utils/fetch';
 import Swal from 'sweetalert2';
 
-const CoinModal = ({ id, name, setMsg, show, setShow, setCoins, setFilteredCoins }) => {
+const CoinModal = ({ id, name, Msg, setMsg, show, setShow, setCoins, setFilteredCoins }) => {
     const isEdit = !!id;
 
     const handleSubmit = (event) => {
         event.preventDefault();
         if (isEdit) {
-            EditCoin({ id, name: event.target.coinName.value }, setMsg);
-            GetCoins([setCoins, setFilteredCoins]);
-            setShow(false);
-            Swal.fire({
-                icon: "success",
-                title: "Success",
-                text: "Coin updated successfully!",
-            });
+            EditCoin({ Id: id, Name: event.target.coinName.value }, setMsg)
+                .then(() => {
+                    GetCoins([setCoins, setFilteredCoins]);
+                    setShow(false);
+                    if (Msg !== null) {
+                        if (Msg.Status === "Success") {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Success",
+                                text: "Coin updated successfully!",
+                            });
+                        }
+                    }
+                    else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Coin edit failed!",
+                        });
+                    }
+                })
         } else {
-            AddCoin({ name: event.target.coinName.value }, setMsg);
-            GetCoins([setCoins, setFilteredCoins]);
-            setShow(false);
-            Swal.fire({
-                icon: "success",
-                title: "Success",
-                text: "Coin added successfully!",
-            });
+            AddCoin({ Name: event.target.coinName.value }, setMsg)
+                .then(() => {
+                    GetCoins([setCoins, setFilteredCoins]);
+                    setShow(false);
+                    if (Msg !== null) {
+                        if (Msg.Status === "Success") {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Success",
+                                text: "Coin added successfully!",
+                            });
+                        }
+                        else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: "Coin add failed!",
+                            });
+                        }
+                    }
+                })
         }
     };
 

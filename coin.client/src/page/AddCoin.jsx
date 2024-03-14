@@ -48,7 +48,7 @@ const AddCoin = () => {
                 <td>{coin.Name}</td>
                 <td className='text-center'>
                     <input type='button' value='Edit' className='btn btn-primary me-2' onClick={() => handleEditCoin(coin.Id, coin.Name)} />
-                    <input type='button' value='Delete' className='btn btn-danger' onClick={() => handleDeleteCoin(coin.Id)} />
+                    <input type='button' value='Delete' className='btn btn-danger' onClick={() => handleDeleteCoin(coin.Id, coin.Name)} />
                 </td>
             </tr>
         ));
@@ -104,9 +104,9 @@ const AddCoin = () => {
         setCoinName(name);
     }
 
-    const handleDeleteCoin = (id) => {
+    const handleDeleteCoin = (id, name) => {
         Swal.fire({
-            title: "Are you sure?",
+            title: "Are you sure delete " + name + "?",
             showDenyButton: true,
             confirmButtonText: "Yes, delete it!",
             denyButtonText: "No, don't delete!",
@@ -177,6 +177,7 @@ const AddCoin = () => {
             <CoinModal
                 id={coinId}
                 name={coinName}
+                Msg={msg}
                 setMsg={setMsg}
                 show={showModal}
                 setShow={setShowModal}

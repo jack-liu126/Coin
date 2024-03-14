@@ -1,5 +1,6 @@
 using Coin.Server.Appcode;
 using Microsoft.Data.SqlClient;
+using Microsoft.OpenApi.Models;
 using NLog;
 using NLog.Extensions.Logging;
 using NLog.Web;
@@ -35,7 +36,14 @@ try
     builder.Services.AddControllers();
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
+    builder.Services.AddSwaggerGen(c =>
+    {
+        c.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Version = "v1",
+            Title = "Coin API",
+        });
+    });
     builder.Host.UseNLog();
 
     builder.Services.AddScoped<DBHelper>(o =>

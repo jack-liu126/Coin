@@ -1,60 +1,60 @@
 ﻿using Coin.Server.Appcode;
 using Coin.Server.Models;
-using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 namespace Coin.Server.Controllers;
 
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiController]
-[EnableCors("AllowSpecificOrigin")]
-public class CoinsController : ControllerBase
+public class TradeController : ControllerBase
 {
-    private readonly ILogger<CoinsController> _logger;
+    private readonly ILogger<TradeController> _logger;
     private readonly DBHelper _dbHelper;
 
-    public CoinsController(ILogger<CoinsController> logger, DBHelper dbHelper)
+    public TradeController(ILogger<TradeController> logger,
+                           DBHelper dbHelper)
     {
         _logger = logger;
         _dbHelper = dbHelper;
     }
 
     [HttpGet("[action]")]
-    public async Task<IActionResult> GetCoins()
+    public async Task<IActionResult> GetTradingDetails()
     {
         ContentResult cr = new ContentResult();
-        _logger.LogInformation("GetCoins called");
+        _logger.LogInformation("GetTradingDetail called");
         try
         {
             cr.StatusCode = 200;
 
-            List<CoinData> Coins = await _dbHelper.GetCoins();
+            List<CryptocurrencyTradingModel> tradingDetails = await _dbHelper.GetTradingDetail();
 
-            cr.Content = JsonSerializer.Serialize(Coins);
+            cr.Content = JsonSerializer.Serialize(tradingDetails);
         }
         catch (Exception ex)
         {
             cr.StatusCode = 400;
             cr.Content = "Bad Request";
-            _logger.LogError(ex, "GetCoins failed");
+            _logger.LogError(ex, "GetTradingDetail failed");
         }
         return cr;
     }
 
     [HttpPost("[action]")]
-    public async Task<IActionResult> AddCoin([FromBody] CoinData coin)
+    public async Task<IActionResult> TradingDetailAdd([FromBody] CryptocurrencyTradingModel tradingDetail)
     {
-        coin.SanitizeStringProperties();
+        tradingDetail.SanitizeStringProperties();
         ContentResult cr = new ContentResult();
-        _logger.LogInformation("AddCoin called");
+        _logger.LogInformation("TradingDetailAdd called");
         try
         {
-            if (await _dbHelper.AddCoin(coin))
+            if (await _dbHelper.TradingAdd(tradingDetail))
             {
                 MessageContent mc = new MessageContent()
                 {
-                    Msg = "Coin added",
+                    Msg = "Trading detail added",
                     Status = "Success"
                 };
                 cr.StatusCode = 200;
@@ -62,37 +62,32 @@ public class CoinsController : ControllerBase
             }
             else
             {
-                MessageContent mc = new MessageContent()
-                {
-                    Msg = "Server error, coin not added",
-                    Status = "Error"
-                };
                 cr.StatusCode = 400;
-                cr.Content = JsonSerializer.Serialize(mc);
+                cr.Content = "Bad Request";
             }
         }
         catch (Exception ex)
         {
             cr.StatusCode = 400;
             cr.Content = "Bad Request";
-            _logger.LogError(ex, "AddCoin failed");
+            _logger.LogError(ex, "TradingDetailAdd failed");
         }
         return cr;
     }
 
     [HttpPost("[action]")]
-    public async Task<IActionResult> EditCoin([FromBody] CoinData coin)
+    public async Task<IActionResult> TradingDetailEdit([FromBody] CryptocurrencyTradingModel tradingDetail)
     {
-        coin.SanitizeStringProperties();
+        tradingDetail.SanitizeStringProperties();
         ContentResult cr = new ContentResult();
-        _logger.LogInformation("EditCoin called");
+        _logger.LogInformation("TradingEdit called");
         try
         {
-            if (await _dbHelper.EditCoin(coin))
+            if (await _dbHelper.TradingEdit(tradingDetail))
             {
                 MessageContent mc = new MessageContent()
                 {
-                    Msg = "Coin edited",
+                    Msg = "Trading detail edited",
                     Status = "Success"
                 };
                 cr.StatusCode = 200;
@@ -100,36 +95,31 @@ public class CoinsController : ControllerBase
             }
             else
             {
-                MessageContent mc = new MessageContent()
-                {
-                    Msg = "Server error, coin not edited",
-                    Status = "Error"
-                };
                 cr.StatusCode = 400;
-                cr.Content = JsonSerializer.Serialize(mc);
+                cr.Content = "Bad Request";
             }
         }
         catch (Exception ex)
         {
             cr.StatusCode = 400;
             cr.Content = "Bad Request";
-            _logger.LogError(ex, "EditCoin failed");
+            _logger.LogError(ex, "TradingEdit failed");
         }
         return cr;
     }
 
     [HttpPost("[action]")]
-    public async Task<IActionResult> DeleteCoin([FromBody] CoinData coin)
+    public async Task<IActionResult> TradingDetailDelete([FromBody] CryptocurrencyTradingModel tradingDetail)
     {
         ContentResult cr = new ContentResult();
-        _logger.LogInformation("DeleteCoin called");
+        _logger.LogInformation("TradingDetailDelete called");
         try
         {
-            if (await _dbHelper.DeleteCoin(coin.Id))
+            if (await _dbHelper.TradingDelete(tradingDetail.Id))
             {
                 MessageContent mc = new MessageContent()
                 {
-                    Msg = "Coin deleted",
+                    Msg = "Trading detail deleted",
                     Status = "Success"
                 };
                 cr.StatusCode = 200;
@@ -137,20 +127,15 @@ public class CoinsController : ControllerBase
             }
             else
             {
-                MessageContent mc = new MessageContent()
-                {
-                    Msg = "Server error, coin not deleted",
-                    Status = "Error"
-                };
                 cr.StatusCode = 400;
-                cr.Content = JsonSerializer.Serialize(mc);
+                cr.Content = "Bad Request";
             }
         }
         catch (Exception ex)
         {
             cr.StatusCode = 400;
             cr.Content = "Bad Request";
-            _logger.LogError(ex, "DeleteCoin failed");
+            _logger.LogError(ex, "TradingDetailDelete failed");
         }
         return cr;
     }

@@ -27,17 +27,33 @@ const fetchData = async (url, setState, method = 'GET', body = null) => {
 };
 
 export const GetCoins = (setCoins) => {
-    fetchData(baseUrl + '/Coins/GetCoins', setCoins);
+    return fetchData(baseUrl + '/Coins/GetCoins', setCoins);
 }
 
 export const AddCoin = (coin, setMsg) => {
-    fetchData(baseUrl + '/Coins/AddCoin', setMsg, 'POST', coin);
+    return fetchData(baseUrl + '/Coins/AddCoin', setMsg, 'POST', coin);
 }
 
 export const EditCoin = (coin, setMsg) => {
-    fetchData(baseUrl + '/Coins/EditCoin', setMsg, 'POST', coin);
+    return fetchData(baseUrl + '/Coins/EditCoin', setMsg, 'POST', coin);
 }
 
 export const DeleteCoin = (coinId, setMsg) => {
-    fetchData(baseUrl + '/Coins/DeleteCoin', setMsg, 'POST', { id: coinId });
+    return fetchData(baseUrl + '/Coins/DeleteCoin', setMsg, 'POST', { id: coinId });
+}
+
+export const GetTradeDetails = (setTradeDetails) => {
+    return fetchData(baseUrl + '/Trade/GetTradeDetails', setTradeDetails);
+}
+
+export const AddTrade = (trade, setMsg) => {
+    return fetchData(baseUrl + '/Trade/TradingDetailAdd', setMsg, 'POST', trade);
+}
+
+export const EditTrade = (trade, setMsg) => {
+    return fetchData(baseUrl + '/Trade/TradingDetailEdit', setMsg, 'POST', trade);
+}
+
+export const DeleteTrade = (tradeId, setMsg) => {
+    return fetchData(baseUrl + '/Trade/TradingDetailDelete', setMsg, 'POST', { id: tradeId });
 }
